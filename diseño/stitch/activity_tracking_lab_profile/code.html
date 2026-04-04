@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activity Tracking - MDM Track Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#181c1e",
+                        "primary": "#000f22",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "surface-container": "#ebeef0",
+                        "surface-dim": "#d7dadc",
+                        "secondary": "#50606f",
+                        "on-tertiary-fixed": "#241a00",
+                        "background": "#f7fafc",
+                        "tertiary-fixed": "#ffe088",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "on-secondary-fixed": "#0d1d2a",
+                        "on-surface-variant": "#43474d",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "on-error-container": "#93000a",
+                        "outline": "#74777e",
+                        "inverse-on-surface": "#eef1f3",
+                        "secondary-fixed-dim": "#b8c8da",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d1e1f4",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b0c8eb",
+                        "on-secondary-fixed-variant": "#394857",
+                        "on-secondary-container": "#556474",
+                        "on-primary-fixed": "#001c37",
+                        "tertiary-container": "#cca830",
+                        "on-tertiary-container": "#4f3e00",
+                        "tertiary": "#735c00",
+                        "on-primary-container": "#768dad",
+                        "outline-variant": "#c4c6ce",
+                        "primary-fixed-dim": "#b0c8eb",
+                        "primary-container": "#0a2540",
+                        "surface": "#f7fafc",
+                        "primary-fixed": "#d2e4ff",
+                        "surface-tint": "#49607e",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-bright": "#f7fafc",
+                        "on-primary-fixed-variant": "#314865",
+                        "surface-container-high": "#e5e9eb",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-low": "#f1f4f6",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d4e4f6",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#181c1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/85 dark:bg-slate-900/85 backdrop-blur-md shadow-sm shadow-slate-900/5 h-16">
+<div class="flex justify-between items-center px-4 h-full w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<button class="p-2 text-slate-900 dark:text-slate-50 active:scale-95 duration-150 rounded-full hover:bg-slate-200/50">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline font-bold text-lg tracking-tight text-slate-900 dark:text-slate-50">Activity Tracking</h1>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="professional medical representative headshot with clean lighting and neutral grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0335yPc86xHscXBnSzO2xy3wVkAVow63zyuY6fMZfbwZsMt_jFI2xQLF_LSNWIitjoSuoA5MbUbSAOYyzcOL2sqtWvVCJfjiP-EN-IgtMLzSkP795XUq7jU3qzDi4a9p212Snkt0VXg7sCQma35J8AemEQz3jnNsWr1uNEoh92seL88M9dcZJCLpZdu9ffYi5lSkdnfzkylEpj9qt0QLfMVBmXhfFjMpm3UvA7qNn1suMwhWn248J2CZBhhLj_xXUBbW6uvPbDx4"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-20 px-4 max-w-7xl mx-auto">
+<!-- Main Layout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Map & Active Controls (Bento Style) -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Map View Card -->
+<section class="bg-surface-container-lowest rounded-full overflow-hidden shadow-sm aspect-video lg:aspect-auto lg:h-[500px] relative">
+<div class="absolute inset-0 z-0">
+<img alt="Map View" class="w-full h-full object-cover brightness-95" data-alt="detailed satellite view of urban medical district with clean overlays and location pins" data-location="Medical District" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7hI7CxvNYmPtoooJHjEaf5yTuiwpmqnI3yeN67b6rbazqt6QOf87XrUPmQjbheo292URklMEkzbtwMrxFAt2N5UvL1v4TOxN_vN5XV5vqPe3eJFdSfI4n9Uo9dGOQZzwMfAWcsclBKgQzB7WYoujOhz4KCd3pcBmvuQVRINCc0HVfIhtINiFCbTwjW16j0qsHVqOpchfCzdxDqMKOvjhBepwUdBfkRvOzfkDsGf_iynv56LcBh2WhBQnQjoN9svBH6rYbtaWyRrQ"/>
+</div>
+<!-- Map Overlays -->
+<div class="absolute top-4 left-4 z-10 glass-panel bg-white/80 p-3 rounded-xl shadow-md border border-white/20">
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="my_location">my_location</span>
+<span class="text-xs uppercase tracking-widest font-label">Live Tracker Active</span>
+</div>
+</div>
+<!-- Floating Action: Start Journey -->
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 w-full px-6 max-w-sm">
+<button class="w-full bg-primary text-on-primary py-4 rounded-full font-headline font-extrabold flex items-center justify-center gap-3 shadow-lg shadow-primary/30 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+                            START FIELD JOURNEY
+                        </button>
+</div>
+</section>
+<!-- Quick Stats / Status Row -->
+<div class="grid grid-cols-3 gap-4">
+<div class="bg-surface-container-low p-4 rounded-full">
+<p class="text-[10px] text-on-surface-variant font-label uppercase tracking-widest mb-1">Scheduled</p>
+<p class="text-2xl font-headline font-bold text-primary">08</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-full">
+<p class="text-[10px] text-on-surface-variant font-label uppercase tracking-widest mb-1">Completed</p>
+<p class="text-2xl font-headline font-bold text-tertiary">03</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-full border-l-4 border-primary">
+<p class="text-[10px] text-on-surface-variant font-label uppercase tracking-widest mb-1">Distance</p>
+<p class="text-2xl font-headline font-bold text-primary">4.2<span class="text-xs ml-1 font-normal">km</span></p>
+</div>
+</div>
+</div>
+<!-- Right Column: Visit Log & Modal Concept -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Visit Log Container -->
+<div class="bg-surface-container rounded-full p-1 h-full flex flex-col min-h-[600px]">
+<div class="px-6 py-4 flex justify-between items-center">
+<h2 class="font-headline font-bold text-on-surface">Daily Itinerary</h2>
+<span class="bg-white/50 px-3 py-1 rounded-full text-xs font-semibold">Today</span>
+</div>
+<div class="flex-1 overflow-y-auto px-2 space-y-2 pb-6 custom-scrollbar">
+<!-- Active/Current Visit Item -->
+<div class="bg-surface-container-lowest p-5 rounded-full shadow-sm border-l-4 border-tertiary relative overflow-hidden">
+<div class="flex items-start justify-between mb-3">
+<div>
+<h3 class="font-bold text-primary">Dr. Elena Rodriguez</h3>
+<p class="text-xs text-on-surface-variant">General Hospital • Oncology</p>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed text-[10px] px-2 py-1 rounded-full font-bold">NEXT UP</span>
+</div>
+<div class="flex items-center gap-4 mt-4">
+<button class="flex-1 bg-primary-container text-white py-2 rounded-full text-xs font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="directions">directions</span> NAVIGATE
+                                </button>
+<button class="flex-1 bg-primary text-white py-2 rounded-full text-xs font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="login">login</span> CHECK-IN
+                                </button>
+</div>
+</div>
+<!-- Scheduled Items -->
+<div class="bg-surface-container-high/50 p-4 rounded-full flex items-center justify-between group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="medical_services">medical_services</span>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-on-surface">Dr. Marcus Thorne</h3>
+<p class="text-[11px] text-on-surface-variant">St. Mary Clinic • 14:30</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="more_vert">more_vert</span>
+</div>
+<div class="bg-surface-container-high/50 p-4 rounded-full flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="local_pharmacy">local_pharmacy</span>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-on-surface">Central Pharma Labs</h3>
+<p class="text-[11px] text-on-surface-variant">Procurement Office • 16:00</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="more_vert">more_vert</span>
+</div>
+<!-- Completed Item -->
+<div class="bg-surface-container-lowest/50 p-4 rounded-full flex items-center justify-between opacity-70">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-700" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-on-surface line-through">Dr. Sarah Jenkins</h3>
+<p class="text-[11px] text-on-surface-variant">Completed • 09:15 AM</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="p-4 mt-auto">
+<button class="w-full bg-white/50 border-2 border-dashed border-outline-variant py-3 rounded-full text-sm font-bold text-on-surface-variant flex items-center justify-center gap-2 hover:bg-white transition-colors">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span> SCHEDULE NEW VISIT
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Inline Form / Modal (Concept Render) -->
+<div class="mt-12 p-8 bg-surface-container-low rounded-3xl max-w-3xl mx-auto shadow-inner relative">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h2 class="text-2xl font-headline font-black text-primary">Log Activity</h2>
+<p class="text-on-surface-variant">Recording visit outcome for current location</p>
+</div>
+<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+</div>
+</div>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-[10px] font-label font-bold uppercase tracking-widest text-on-surface-variant ml-2">Outcome Status</label>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-xs" type="button">VISITED</button>
+<button class="flex-1 bg-surface-container-highest text-on-surface-variant py-3 rounded-xl font-bold text-xs" type="button">BUSY</button>
+<button class="flex-1 bg-surface-container-highest text-on-surface-variant py-3 rounded-xl font-bold text-xs" type="button">OUT</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-[10px] font-label font-bold uppercase tracking-widest text-on-surface-variant ml-2">Visit Type</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20">
+<option>Product Samples</option>
+<option>Order Collection</option>
+<option>Initial Intro</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-[10px] font-label font-bold uppercase tracking-widest text-on-surface-variant ml-2">Observations &amp; Notes</label>
+<textarea class="w-full bg-surface-container-highest border-none rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Enter visit details..." rows="3"></textarea>
+</div>
+<div class="space-y-2">
+<label class="block text-[10px] font-label font-bold uppercase tracking-widest text-on-surface-variant ml-2">Evidence / Photos</label>
+<div class="grid grid-cols-4 gap-4">
+<div class="aspect-square bg-white rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-outline-variant cursor-pointer hover:bg-slate-50">
+<span class="material-symbols-outlined text-outline" data-icon="add_a_photo">add_a_photo</span>
+<span class="text-[9px] font-bold mt-1 text-outline">ATTACH</span>
+</div>
+<div class="aspect-square rounded-2xl overflow-hidden shadow-sm">
+<img alt="Evidence 1" class="w-full h-full object-cover" data-alt="close-up of a signed medical delivery confirmation form on a clipboard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuopJLQf44cwId8T8eT9pw7z4uwoiZzRbaoY0usvgnfBVfeK5kAC_0LB11kwu9UVHxX0RlUx1EpxFn2IrNz-tVyB1cdeD3AXkhBWlDg_xh1TLOrzz26tKdkqqpqDPj7vJQEUencX1jbokxCinMaxaJxt_Pfhx_nLLDrDqFpXO41Lz4FE1_R3qOsT3JopKXL-Gv8Q50PcIJ0SX35VwO7PMXjNVl521NIH9k2H9FnxX1h8B5q3r78cq-bdmdNvPonoFMet5gg9wvUB4"/>
+</div>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-on-primary py-4 rounded-full font-headline font-bold shadow-lg shadow-primary/20 active:translate-y-0.5 transition-transform">
+                        SUBMIT VISIT REPORT
+                    </button>
+</div>
+</form>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-4 pt-2 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md z-50 rounded-t-2xl shadow-[0px_-4px_20px_rgba(0,15,34,0.06)]">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 p-2 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-widest mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl px-3 py-1.5 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="location_searching" style="font-variation-settings: 'FILL' 1;">location_searching</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-widest mt-1">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 p-2 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-widest mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 p-2 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-widest mt-1">Admin</span>
+</a>
+</nav>
+<!-- FAB for quick task addition (only on main screens) -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-tertiary text-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all z-40 lg:bottom-12">
+<span class="material-symbols-outlined text-3xl" data-icon="edit_square">edit_square</span>
+</button>
+</body></html>

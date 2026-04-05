@@ -28,10 +28,10 @@ import androidx.compose.ui.unit.sp
 // ── Activity Tracking screen ──────────────────────────────────────────────────
 
 @Composable
-fun ActivityScreen() {
+fun ActivityScreen(onUserClick: () -> Unit) {
     val colors = MaterialTheme.colorScheme
-    var selectedOutcome by remember { mutableStateOf("VISITED") }
-    var visitType      by remember { mutableStateOf("Product Samples") }
+    var selectedOutcome by remember { mutableStateOf("VISITADO") }
+    var visitType      by remember { mutableStateOf("Muestras de producto") }
     var observations   by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -41,7 +41,7 @@ fun ActivityScreen() {
                 .background(colors.background),
             contentPadding = PaddingValues(bottom = 96.dp),
         ) {
-            item { ActivityTopBar() }
+            item { ActivityTopBar(onUserClick = onUserClick) }
             item { MapSection() }
             item { StatsRow() }
             item { DailyItinerarySection() }
@@ -67,7 +67,7 @@ fun ActivityScreen() {
             contentColor   = Color.White,
             shape          = CircleShape,
         ) {
-            Icon(Icons.Default.Edit, contentDescription = "Log")
+            Icon(Icons.Default.Edit, contentDescription = "Registrar actividad")
         }
     }
 }
@@ -75,7 +75,7 @@ fun ActivityScreen() {
 // ── Top app bar ───────────────────────────────────────────────────────────────
 
 @Composable
-private fun ActivityTopBar() {
+private fun ActivityTopBar(onUserClick: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier
@@ -89,9 +89,9 @@ private fun ActivityTopBar() {
             verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(Icons.Default.Menu, contentDescription = "Menu", tint = colors.onSurface)
+            Icon(Icons.Default.Menu, contentDescription = "Menu principal", tint = colors.onSurface)
             Text(
-                "Activity Tracking",
+                "Seguimiento de actividad",
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.3).sp,
@@ -99,16 +99,16 @@ private fun ActivityTopBar() {
                 color = colors.onSurface,
             )
         }
-        Box(
+        IconButton(
+            onClick = onUserClick,
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
                 .background(colors.primaryContainer),
-            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 Icons.Default.Person,
-                contentDescription = "Profile",
+                contentDescription = "Cuenta de usuario",
                 tint = colors.primary,
                 modifier = Modifier.size(20.dp),
             )
@@ -138,7 +138,7 @@ private fun MapSection() {
                 )
             ),
     ) {
-        // "LIVE TRACKER ACTIVE" badge
+        // Insignia de rastreo activo
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -157,7 +157,7 @@ private fun MapSection() {
                     modifier = Modifier.size(15.dp),
                 )
                 Text(
-                    "LIVE TRACKER ACTIVE",
+                    "RASTREO EN VIVO ACTIVO",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp,
@@ -168,7 +168,7 @@ private fun MapSection() {
             }
         }
 
-        // CTA button
+        // Boton de accion
         Button(
             onClick = {},
             modifier = Modifier
@@ -189,7 +189,7 @@ private fun MapSection() {
             ) {
                 Icon(Icons.Default.PlayArrow, contentDescription = null)
                 Text(
-                    "START FIELD JOURNEY",
+                    "INICIAR JORNADA EN CAMPO",
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 1.sp,
@@ -211,10 +211,10 @@ private fun StatsRow() {
             .padding(horizontal = 16.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        StatCard(modifier = Modifier.weight(1f), label = "SCHEDULED", value = "08", valueColor = colors.primary)
-        StatCard(modifier = Modifier.weight(1f), label = "COMPLETED", value = "03", valueColor = colors.tertiary)
+        StatCard(modifier = Modifier.weight(1f), label = "PROGRAMADAS", value = "08", valueColor = colors.primary)
+        StatCard(modifier = Modifier.weight(1f), label = "COMPLETADAS", value = "03", valueColor = colors.tertiary)
 
-        // Distance card – left accent border
+        // Tarjeta de distancia con acento lateral
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -231,7 +231,7 @@ private fun StatsRow() {
                 )
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(
-                        "DISTANCE",
+                        "DISTANCIA",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp,
@@ -304,7 +304,7 @@ private fun DailyItinerarySection() {
             verticalAlignment     = Alignment.CenterVertically,
         ) {
             Text(
-                "Daily Itinerary",
+                "Itinerario diario",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = colors.onSurface,
             )
@@ -313,7 +313,7 @@ private fun DailyItinerarySection() {
                 shape = RoundedCornerShape(50.dp),
             ) {
                 Text(
-                    "Today",
+                    "Hoy",
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     color = colors.onSurface,
@@ -330,19 +330,19 @@ private fun DailyItinerarySection() {
         // Scheduled
         ScheduledVisitItem(
             name     = "Dr. Marcus Thorne",
-            location = "St. Mary Clinic • 14:30",
+            location = "Clinica St. Mary • 14:30",
             icon     = Icons.Default.MedicalServices,
         )
         Spacer(Modifier.height(8.dp))
         ScheduledVisitItem(
             name     = "Central Pharma Labs",
-            location = "Procurement Office • 16:00",
+            location = "Oficina de compras • 16:00",
             icon     = Icons.Default.LocalPharmacy,
         )
         Spacer(Modifier.height(8.dp))
 
         // Completed
-        CompletedVisitItem(name = "Dr. Sarah Jenkins", sub = "Completed • 09:15 AM")
+        CompletedVisitItem(name = "Dra. Sarah Jenkins", sub = "Completada • 09:15 a. m.")
         Spacer(Modifier.height(12.dp))
 
         // Dashed CTA
@@ -360,7 +360,7 @@ private fun DailyItinerarySection() {
             ) {
                 Icon(Icons.Default.AddCircle, contentDescription = null)
                 Text(
-                    "SCHEDULE NEW VISIT",
+                    "PROGRAMAR NUEVA VISITA",
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp,
@@ -401,7 +401,7 @@ private fun ActiveVisitCard() {
                             color = colors.primary,
                         )
                         Text(
-                            "General Hospital • Oncology",
+                            "Hospital General • Oncologia",
                             style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
                             color = colors.onSurfaceVariant,
                         )
@@ -412,7 +412,7 @@ private fun ActiveVisitCard() {
                         shape = RoundedCornerShape(50.dp),
                     ) {
                         Text(
-                            "NEXT UP",
+                            "SIGUIENTE",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp,
@@ -430,14 +430,14 @@ private fun ActiveVisitCard() {
                 ) {
                     VisitActionButton(
                         modifier       = Modifier.weight(1f),
-                        label          = "NAVIGATE",
+                        label          = "NAVEGAR",
                         icon           = Icons.Default.Directions,
                         containerColor = colors.primaryContainer,
                         contentColor   = Color.White,
                     )
                     VisitActionButton(
                         modifier       = Modifier.weight(1f),
-                        label          = "CHECK-IN",
+                        label          = "LLEGADA",
                         icon           = Icons.Default.Login,
                         containerColor = colors.primary,
                         contentColor   = Color.White,
@@ -595,12 +595,12 @@ private fun LogActivityForm(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "Log Activity",
+                        "Registrar actividad",
                         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Black),
                         color = colors.primary,
                     )
                     Text(
-                        "Recording visit outcome for current location",
+                        "Registrando resultado de visita para la ubicacion actual",
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant,
                     )
@@ -619,13 +619,13 @@ private fun LogActivityForm(
             Spacer(Modifier.height(24.dp))
 
             // Outcome status
-            FormLabel("OUTCOME STATUS")
+            FormLabel("ESTADO DE RESULTADO")
             Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                listOf("VISITED", "BUSY", "OUT").forEach { outcome ->
+                listOf("VISITADO", "OCUPADO", "AUSENTE").forEach { outcome ->
                     val isSelected = selectedOutcome == outcome
                     Button(
                         onClick = { onOutcomeSelected(outcome) },
@@ -645,19 +645,19 @@ private fun LogActivityForm(
             Spacer(Modifier.height(16.dp))
 
             // Visit type (simple custom dropdown)
-            FormLabel("VISIT TYPE")
+            FormLabel("TIPO DE VISITA")
             Spacer(Modifier.height(8.dp))
             VisitTypeDropdown(visitType, onVisitTypeChanged)
 
             Spacer(Modifier.height(16.dp))
 
             // Observations
-            FormLabel("OBSERVATIONS & NOTES")
+            FormLabel("OBSERVACIONES Y NOTAS")
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value       = observations,
                 onValueChange = onObservationsChanged,
-                placeholder = { Text("Enter visit details...", color = colors.onSurfaceVariant) },
+                placeholder = { Text("Ingresa detalles de la visita...", color = colors.onSurfaceVariant) },
                 modifier    = Modifier.fillMaxWidth(),
                 shape       = RoundedCornerShape(16.dp),
                 minLines    = 3,
@@ -672,7 +672,7 @@ private fun LogActivityForm(
             Spacer(Modifier.height(16.dp))
 
             // Evidence / Photos
-            FormLabel("EVIDENCE / PHOTOS")
+            FormLabel("EVIDENCIA / FOTOS")
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Box(
@@ -686,12 +686,12 @@ private fun LogActivityForm(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             Icons.Default.CameraAlt,
-                            contentDescription = "Attach photo",
+                            contentDescription = "Adjuntar foto",
                             tint = colors.outline,
                             modifier = Modifier.size(24.dp),
                         )
                         Text(
-                            "ATTACH",
+                            "ADJUNTAR",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 fontSize   = 9.sp,
@@ -723,7 +723,7 @@ private fun LogActivityForm(
                 contentPadding = PaddingValues(vertical = 16.dp),
             ) {
                 Text(
-                    "SUBMIT VISIT REPORT",
+                    "ENVIAR REPORTE DE VISITA",
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp,
@@ -750,7 +750,7 @@ private fun FormLabel(text: String) {
 @Composable
 private fun VisitTypeDropdown(current: String, onSelected: (String) -> Unit) {
     val colors  = MaterialTheme.colorScheme
-    val options = listOf("Product Samples", "Order Collection", "Initial Intro")
+    val options = listOf("Muestras de producto", "Toma de pedido", "Introduccion inicial")
     var expanded by remember { mutableStateOf(false) }
 
     Box {

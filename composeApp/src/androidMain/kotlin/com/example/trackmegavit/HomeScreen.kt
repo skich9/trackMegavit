@@ -22,14 +22,14 @@ import androidx.compose.ui.unit.sp
 // ── Home / Dashboard screen ───────────────────────────────────────────────────
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onUserClick: () -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = 24.dp),
     ) {
-        item { HomeTopBar() }
+        item { HomeTopBar(onUserClick = onUserClick) }
         item { KpiSection() }
         item { QuickActionsCard() }
         item { VisitPerformanceChart() }
@@ -41,7 +41,7 @@ fun HomeScreen() {
 // ── Top bar ───────────────────────────────────────────────────────────────────
 
 @Composable
-private fun HomeTopBar() {
+private fun HomeTopBar(onUserClick: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier
@@ -55,7 +55,7 @@ private fun HomeTopBar() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(Icons.Default.Menu, contentDescription = "Menu", tint = colors.onSurface)
+            Icon(Icons.Default.Menu, contentDescription = "Menu principal", tint = colors.onSurface)
             Column {
                 Text(
                     text = "MDM Track Pro",
@@ -66,7 +66,7 @@ private fun HomeTopBar() {
                     color = colors.onSurface,
                 )
                 Text(
-                    text = "LABORATORY",
+                    text = "LABORATORIO",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp,
@@ -81,23 +81,23 @@ private fun HomeTopBar() {
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
-                text = "Active Session: 4h 12m",
+                text = "Sesion activa: 4h 12m",
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.5.sp,
                 ),
                 color = colors.onSurfaceVariant,
             )
-            Box(
+            IconButton(
+                onClick = onUserClick,
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(colors.primaryContainer),
-                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Default.Person,
-                    contentDescription = "Profile",
+                    contentDescription = "Cuenta de usuario",
                     tint = colors.primary,
                     modifier = Modifier.size(20.dp),
                 )
@@ -118,23 +118,23 @@ private fun KpiSection() {
     ) {
         KpiCard(
             modifier = Modifier.weight(1f),
-            label = "Visits Today",
+            label = "Visitas hoy",
             value = "8/12",
-            sub = "4 remaining",
+            sub = "4 pendientes",
             icon = Icons.Default.GpsFixed,
         )
         KpiCard(
             modifier = Modifier.weight(1f),
-            label = "Samples",
+            label = "Muestras",
             value = "24",
-            sub = "Avg 3.0/visit",
+            sub = "Prom. 3.0/visita",
             icon = Icons.Default.Science,
         )
         KpiCard(
             modifier = Modifier.weight(1f),
-            label = "Compliance",
+            label = "Cumplimiento",
             value = "96%",
-            sub = "+2% last week",
+            sub = "+2% vs semana pasada",
             icon = Icons.Default.VerifiedUser,
         )
     }
@@ -215,13 +215,13 @@ private fun QuickActionsCard() {
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             QuickActionButton(
-                label = "Check-in",
+                label = "Registrar llegada",
                 icon = Icons.Default.Login,
                 containerColor = colors.primary,
                 contentColor = colors.onPrimary,
             )
             QuickActionButton(
-                label = "New Visit",
+                label = "Nueva visita",
                 icon = Icons.Default.AddCircle,
                 containerColor = Color.White,
                 contentColor = colors.primary,
@@ -274,7 +274,7 @@ private fun QuickActionButton(
 @Composable
 private fun VisitPerformanceChart() {
     val colors = MaterialTheme.colorScheme
-    val days = listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
+    val days = listOf("LUN", "MAR", "MIE", "JUE", "VIE", "SAB", "DOM")
     val heights = listOf(0.60f, 0.85f, 0.95f, 0.40f, 0.70f, 0.20f, 0.15f)
     val active = listOf(true, true, true, true, true, false, false)
 
@@ -294,12 +294,12 @@ private fun VisitPerformanceChart() {
             ) {
                 Column {
                     Text(
-                        "Visit Performance",
+                        "Rendimiento de visitas",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = colors.onSurface,
                     )
                     Text(
-                        "WEEKLY COMPLETION STATUS",
+                        "ESTADO DE CUMPLIMIENTO SEMANAL",
                         style = MaterialTheme.typography.labelSmall.copy(
                             letterSpacing = 1.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -317,7 +317,7 @@ private fun VisitPerformanceChart() {
                 ) {
                     Box(Modifier.size(6.dp).background(colors.primary, CircleShape))
                     Text(
-                        "COMPLETED",
+                        "COMPLETADO",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 9.sp,
@@ -392,13 +392,13 @@ private fun RecentActivitySection() {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "Recent Activity",
+                "Actividad reciente",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = colors.onSurface,
             )
             TextButton(onClick = {}) {
                 Text(
-                    "VIEW ALL",
+                    "VER TODO",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp,
@@ -409,11 +409,11 @@ private fun RecentActivitySection() {
             }
         }
         Spacer(Modifier.height(8.dp))
-        RecentActivityItem("Dr. Sarah Miller",  "10:30 AM • 3 Samples", isCompleted = true)
+        RecentActivityItem("Dra. Sarah Miller",  "10:30 a. m. • 3 muestras", isCompleted = true)
         Spacer(Modifier.height(8.dp))
-        RecentActivityItem("Riverside Clinic",  "09:15 AM • 7 Samples", isCompleted = true)
+        RecentActivityItem("Clinica Riverside",  "09:15 a. m. • 7 muestras", isCompleted = true)
         Spacer(Modifier.height(8.dp))
-        RecentActivityItem("Dr. James Wilson",  "Scheduled • 11:45 AM", isCompleted = false)
+        RecentActivityItem("Dr. James Wilson",  "Programada • 11:45 a. m.", isCompleted = false)
     }
 }
 
@@ -482,7 +482,7 @@ private fun MonthlyMilestoneCard() {
     ) {
         Column {
             Text(
-                "UPCOMING MILESTONE",
+                "META PROXIMA",
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
@@ -492,7 +492,7 @@ private fun MonthlyMilestoneCard() {
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Monthly Reward Eligibility",
+                "Elegibilidad de recompensa mensual",
                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                 color = Color.White,
             )

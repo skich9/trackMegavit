@@ -3,16 +3,44 @@ package com.example.trackmegavit
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Brightness4
+import androidx.compose.material.icons.filled.Brightness7
+import androidx.compose.material.icons.filled.GpsFixed
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LockReset
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
@@ -20,7 +48,7 @@ import kotlin.time.TimeSource
 enum class Screen { HOME, ACTIVITY, REPORTS, ADMIN }
 
 private data class AuthUiState(
-    val isAuthenticated: Boolean = false,
+    val session: UserSession? = null,
     val failedAttempts: Int = 0,
     val lockedUntil: TimeSource.Monotonic.ValueTimeMark? = null,
 )
@@ -31,43 +59,66 @@ private val LOCK_DURATION: Duration = 20.seconds
 @Composable
 @Preview
 fun App() {
-    MdmTrackProTheme {
+    val isDarkSystemTheme = isSystemInDarkTheme()
+    var darkTheme by remember { mutableStateOf(isDarkSystemTheme) }
+
+    MdmTrackProTheme(darkTheme = darkTheme) {
+        val scope = rememberCoroutineScope()
         var authState by remember { mutableStateOf(AuthUiState()) }
         var current by remember { mutableStateOf(Screen.HOME) }
-        val isLocked = authState.lockedUntil?.hasNotPassedNow() == true
+        var userMenuExpanded by remember { mutableStateOf(false) }
+        var showChangePasswordDialog by remember { mutableStateOf(false) }
+        var newPassword by remember { mutableStateOf("") }
+        var isUpdatingPassword by remember { mutableStateOf(false) }
+        val snackbarHostState = remember { SnackbarHostState() }
 
-        if (!authState.isAuthenticated) {
+        val isLocked = authState.lockedUntil?.hasNotPassedNow() == true
+        val currentSession = authState.session
+
+        if (currentSession == null) {
             LoginScreen(
                 isLocked = isLocked,
-                lockSeconds = if (isLocked) {
-                    authState.lockedUntil?.remainingLockSeconds() ?: 0
-                } else {
-                    0
-                },
+                lockSeconds = if (isLocked) authState.lockedUntil?.remainingLockSeconds() ?: 0 else 0,
                 onLogin = { username, password ->
-                    val success = isValidCredentials(username, password)
-                    if (success) {
-                        authState = AuthUiState(isAuthenticated = true)
-                    } else {
-                        val attempts = authState.failedAttempts + 1
-                        authState = if (attempts >= MAX_FAILED_ATTEMPTS) {
-                            authState.copy(
-                                failedAttempts = 0,
-                                lockedUntil = TimeSource.Monotonic.markNow() + LOCK_DURATION,
-                            )
-                        } else {
-                            authState.copy(failedAttempts = attempts)
+                    when (val result = SupabaseAuthService.signIn(username, password)) {
+                        is LoginResult.Success -> {
+                            authState = AuthUiState(session = result.session)
+                            current = allowedScreensFor(result.session.role).first()
+                            result
+                        }
+                        is LoginResult.Error -> {
+                            val attempts = authState.failedAttempts + 1
+                            authState = if (attempts >= MAX_FAILED_ATTEMPTS) {
+                                authState.copy(
+                                    failedAttempts = 0,
+                                    lockedUntil = TimeSource.Monotonic.markNow() + LOCK_DURATION,
+                                )
+                            } else {
+                                authState.copy(failedAttempts = attempts)
+                            }
+                            result
                         }
                     }
-                    success
                 },
             )
             return@MdmTrackProTheme
         }
 
+        val allowedScreens = allowedScreensFor(currentSession.role)
+        if (current !in allowedScreens) {
+            current = allowedScreens.first()
+        }
+
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
-            bottomBar = { MdmBottomNav(current) { current = it } },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            bottomBar = {
+                MdmBottomNav(
+                    current = current,
+                    allowedScreens = allowedScreens,
+                    onSelect = { current = it },
+                )
+            },
         ) { padding ->
             Box(
                 modifier = Modifier
@@ -75,73 +126,199 @@ fun App() {
                     .padding(padding),
             ) {
                 when (current) {
-                    Screen.HOME     -> HomeScreen()
-                    Screen.ACTIVITY -> ActivityScreen()
-                    Screen.REPORTS  -> PlaceholderScreen("Reports")
-                    Screen.ADMIN    -> PlaceholderScreen("Admin")
+                    Screen.HOME -> HomeScreen(onUserClick = { userMenuExpanded = true })
+                    Screen.ACTIVITY -> ActivityScreen(onUserClick = { userMenuExpanded = true })
+                    Screen.REPORTS -> PlaceholderScreen("Reportes")
+                    Screen.ADMIN -> PlaceholderScreen("Administracion")
+                }
+
+                Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                    DropdownMenu(
+                        expanded = userMenuExpanded,
+                        onDismissRequest = { userMenuExpanded = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(currentSession.email) },
+                            onClick = {},
+                            enabled = false,
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Cambiar contrasena") },
+                            leadingIcon = {
+                                Icon(Icons.Default.LockReset, contentDescription = null)
+                            },
+                            onClick = {
+                                userMenuExpanded = false
+                                showChangePasswordDialog = true
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(if (darkTheme) "Usar modo claro" else "Usar modo oscuro")
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = if (darkTheme) {
+                                        Icons.Default.Brightness7
+                                    } else {
+                                        Icons.Default.Brightness4
+                                    },
+                                    contentDescription = null,
+                                )
+                            },
+                            onClick = {
+                                darkTheme = !darkTheme
+                                userMenuExpanded = false
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Cerrar sesion") },
+                            leadingIcon = {
+                                Icon(Icons.Default.Logout, contentDescription = null)
+                            },
+                            onClick = {
+                                userMenuExpanded = false
+                                scope.launch {
+                                    SupabaseAuthService.signOut()
+                                    authState = AuthUiState()
+                                    current = Screen.HOME
+                                    snackbarHostState.showSnackbar("Sesion cerrada correctamente")
+                                }
+                            },
+                        )
+                    }
+                }
+
+                if (showChangePasswordDialog) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            if (!isUpdatingPassword) {
+                                showChangePasswordDialog = false
+                                newPassword = ""
+                            }
+                        },
+                        title = { Text("Cambiar contrasena") },
+                        text = {
+                            OutlinedTextField(
+                                value = newPassword,
+                                onValueChange = { newPassword = it },
+                                label = { Text("Nueva contrasena") },
+                                singleLine = true,
+                                visualTransformation = PasswordVisualTransformation(),
+                            )
+                        },
+                        confirmButton = {
+                            TextButton(
+                                enabled = !isUpdatingPassword,
+                                onClick = {
+                                    val password = newPassword.trim()
+                                    if (password.length < 6) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                "La contrasena debe tener al menos 6 caracteres",
+                                            )
+                                        }
+                                        return@TextButton
+                                    }
+
+                                    scope.launch {
+                                        isUpdatingPassword = true
+                                        val result = SupabaseAuthService.changePassword(password)
+                                        isUpdatingPassword = false
+                                        if (result.isSuccess) {
+                                            showChangePasswordDialog = false
+                                            newPassword = ""
+                                            snackbarHostState.showSnackbar("Contrasena actualizada")
+                                        } else {
+                                            snackbarHostState.showSnackbar(
+                                                "No se pudo actualizar la contrasena",
+                                            )
+                                        }
+                                    }
+                                },
+                            ) {
+                                Text(if (isUpdatingPassword) "Actualizando..." else "Actualizar")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                enabled = !isUpdatingPassword,
+                                onClick = {
+                                    showChangePasswordDialog = false
+                                    newPassword = ""
+                                },
+                            ) {
+                                Text("Cancelar")
+                            }
+                        },
+                    )
                 }
             }
         }
     }
 }
 
-private fun isValidCredentials(username: String, password: String): Boolean {
-    // Login temporal local; luego puede migrar a backend seguro.
-    return username.trim().equals("admin", ignoreCase = true) && password == "TrackMegavit123"
-}
-
-private fun TimeSource.Monotonic.ValueTimeMark.remainingLockSeconds(): Int {
-    val remaining = this - TimeSource.Monotonic.markNow()
-    return remaining.inWholeSeconds.coerceAtLeast(0).toInt()
+private fun allowedScreensFor(role: UserRole): List<Screen> {
+    return when (role) {
+        UserRole.ADMINISTRADOR -> listOf(
+            Screen.HOME,
+            Screen.ACTIVITY,
+            Screen.REPORTS,
+            Screen.ADMIN,
+        )
+        UserRole.SUPERVISOR -> listOf(
+            Screen.HOME,
+            Screen.ACTIVITY,
+            Screen.REPORTS,
+        )
+        UserRole.ASESOR_VENTAS -> listOf(
+            Screen.HOME,
+            Screen.ACTIVITY,
+        )
+    }
 }
 
 @Composable
-private fun MdmBottomNav(current: Screen, onSelect: (Screen) -> Unit) {
+private fun MdmBottomNav(
+    current: Screen,
+    allowedScreens: List<Screen>,
+    onSelect: (Screen) -> Unit,
+) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.97f),
         tonalElevation = 0.dp,
     ) {
         val itemColors = NavigationBarItemDefaults.colors(
-            selectedIconColor   = MaterialTheme.colorScheme.onPrimary,
-            selectedTextColor   = MaterialTheme.colorScheme.onSurface,
+            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+            selectedTextColor = MaterialTheme.colorScheme.onSurface,
             unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            indicatorColor      = MaterialTheme.colorScheme.primary,
+            indicatorColor = MaterialTheme.colorScheme.primary,
         )
         val labelStyle = MaterialTheme.typography.labelSmall.copy(
-            fontWeight   = FontWeight.Bold,
-            fontSize     = 9.sp,
+            fontWeight = FontWeight.Bold,
+            fontSize = 9.sp,
             letterSpacing = 0.5.sp,
         )
 
-        NavigationBarItem(
-            selected = current == Screen.HOME,
-            onClick  = { onSelect(Screen.HOME) },
-            icon     = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label    = { Text("HOME", style = labelStyle) },
-            colors   = itemColors,
+        val navItems = listOf(
+            Triple(Screen.HOME, Icons.Default.Home, "INICIO"),
+            Triple(Screen.ACTIVITY, Icons.Default.GpsFixed, "ACTIVIDAD"),
+            Triple(Screen.REPORTS, Icons.Default.Assessment, "REPORTES"),
+            Triple(Screen.ADMIN, Icons.Default.AdminPanelSettings, "ADMIN"),
         )
-        NavigationBarItem(
-            selected = current == Screen.ACTIVITY,
-            onClick  = { onSelect(Screen.ACTIVITY) },
-            icon     = { Icon(Icons.Default.GpsFixed, contentDescription = "Activity") },
-            label    = { Text("ACTIVITY", style = labelStyle) },
-            colors   = itemColors,
-        )
-        NavigationBarItem(
-            selected = current == Screen.REPORTS,
-            onClick  = { onSelect(Screen.REPORTS) },
-            icon     = { Icon(Icons.Default.Assessment, contentDescription = "Reports") },
-            label    = { Text("REPORTS", style = labelStyle) },
-            colors   = itemColors,
-        )
-        NavigationBarItem(
-            selected = current == Screen.ADMIN,
-            onClick  = { onSelect(Screen.ADMIN) },
-            icon     = { Icon(Icons.Default.AdminPanelSettings, contentDescription = "Admin") },
-            label    = { Text("ADMIN", style = labelStyle) },
-            colors   = itemColors,
-        )
+
+        navItems
+            .filter { it.first in allowedScreens }
+            .forEach { (screen, icon, label) ->
+                NavigationBarItem(
+                    selected = current == screen,
+                    onClick = { onSelect(screen) },
+                    icon = { Icon(icon, contentDescription = label) },
+                    label = { Text(label, style = labelStyle) },
+                    colors = itemColors,
+                )
+            }
     }
 }
 
@@ -150,4 +327,9 @@ private fun PlaceholderScreen(title: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(title, style = MaterialTheme.typography.headlineMedium)
     }
+}
+
+private fun TimeSource.Monotonic.ValueTimeMark.remainingLockSeconds(): Int {
+    val remaining = this - TimeSource.Monotonic.markNow()
+    return remaining.inWholeSeconds.coerceAtLeast(0).toInt()
 }

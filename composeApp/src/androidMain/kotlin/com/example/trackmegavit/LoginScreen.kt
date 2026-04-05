@@ -30,6 +30,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -42,17 +43,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     isLocked: Boolean,
     lockSeconds: Int,
-    onLogin: (username: String, password: String) -> Boolean,
+    onLogin: suspend (username: String, password: String) -> LoginResult,
 ) {
     val colors = MaterialTheme.colorScheme
+    val scope = rememberCoroutineScope()
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
 
     Box(
@@ -108,7 +112,7 @@ fun LoginScreen(
                             color = colors.onSurface,
                         )
                         Text(
-                            text = "SECURE ACCESS",
+                            text = "ACCESO SEGURO",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.8.sp,
@@ -126,7 +130,7 @@ fun LoginScreen(
                         username = it
                         message = ""
                     },
-                    label = { Text("Usuario") },
+                    label = { Text("Usuario (nickname)") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -188,12 +192,21 @@ fun LoginScreen(
                             message = "Usuario y contraseña son obligatorios"
                             return@Button
                         }
-                        val ok = onLogin(user, password)
-                        if (!ok) {
-                            message = "Credenciales inválidas"
+                        scope.launch {
+                            isLoading = true
+                            message = ""
+                            when (val result = onLogin(user, password)) {
+                                is LoginResult.Success -> {
+                                    message = ""
+                                }
+                                is LoginResult.Error -> {
+                                    message = result.message
+                                }
+                            }
+                            isLoading = false
                         }
                     },
-                    enabled = !isLocked,
+                    enabled = !isLocked && !isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
@@ -204,7 +217,7 @@ fun LoginScreen(
                     ),
                 ) {
                     Text(
-                        text = "INICIAR SESION",
+                        text = if (isLoading) "VALIDANDO..." else "INICIAR SESION",
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 0.8.sp,
@@ -214,14 +227,12 @@ fun LoginScreen(
 
                 TextButton(
                     onClick = {
-                        username = "admin"
-                        password = "TrackMegavit123"
-                        message = "Demo cargada"
+                        message = "Ingresa tu nickname y contraseña del sistema"
                     },
                     modifier = Modifier.align(Alignment.End),
-                    enabled = !isLocked,
+                    enabled = !isLocked && !isLoading,
                 ) {
-                    Text("Usar credenciales demo")
+                    Text("¿Olvidaste tus credenciales?")
                 }
             }
         }

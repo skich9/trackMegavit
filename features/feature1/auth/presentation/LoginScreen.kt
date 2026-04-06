@@ -1,5 +1,6 @@
-package com.example.trackmegavit
+﻿package com.example.trackmegavit.feature.auth.presentation
 
+import com.example.trackmegavit.feature.auth.domain.LoginResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -147,7 +148,7 @@ fun LoginScreen(
                         password = it
                         message = ""
                     },
-                    label = { Text("Contraseña") },
+                    label = { Text("ContraseÃ±a") },
                     singleLine = true,
                     enabled = !isLocked,
                     modifier = Modifier.fillMaxWidth(),
@@ -161,7 +162,7 @@ fun LoginScreen(
                         IconButton(onClick = { showPassword = !showPassword }) {
                             Icon(
                                 imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (showPassword) "Ocultar contraseña" else "Mostrar contraseña",
+                                contentDescription = if (showPassword) "Ocultar contraseÃ±a" else "Mostrar contraseÃ±a",
                             )
                         }
                     },
@@ -189,7 +190,7 @@ fun LoginScreen(
                     onClick = {
                         val user = username.trim()
                         if (user.isEmpty() || password.isEmpty()) {
-                            message = "Usuario y contraseña son obligatorios"
+                            message = "Usuario y contraseÃ±a son obligatorios"
                             return@Button
                         }
                         scope.launch {
@@ -227,12 +228,12 @@ fun LoginScreen(
 
                 TextButton(
                     onClick = {
-                        message = "Ingresa tu nickname y contraseña del sistema"
+                        message = "Ingresa tu nickname y contraseÃ±a del sistema"
                     },
                     modifier = Modifier.align(Alignment.End),
                     enabled = !isLocked && !isLoading,
                 ) {
-                    Text("¿Olvidaste tus credenciales?")
+                    Text("Â¿Olvidaste tus credenciales?")
                 }
             }
         }

@@ -1,4 +1,6 @@
-package com.example.trackmegavit
+package com.example.trackmegavit.feature.auth.domain
+
+// ── Modelos de dominio de autenticación ───────────────────────────────────────
 
 enum class UserRole {
     ADMINISTRADOR,

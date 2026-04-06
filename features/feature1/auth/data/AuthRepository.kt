@@ -1,55 +1,16 @@
-package com.example.trackmegavit
+package com.example.trackmegavit.feature.auth.data
 
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.postgrest.Postgrest
+import com.example.trackmegavit.BuildConfig
+import com.example.trackmegavit.core.network.SupabaseClientProvider
+import com.example.trackmegavit.feature.auth.domain.LoginResult
+import com.example.trackmegavit.feature.auth.domain.UserRole
+import com.example.trackmegavit.feature.auth.domain.UserSession
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
-import io.github.jan.supabase.postgrest.query.filter.FilterOperator
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-// ── Modelos de tablas ─────────────────────────────────────────────────────────
+// ── Repositorio de autenticación ──────────────────────────────────────────────
+object AuthRepository {
 
-@Serializable
-data class UsuarioRow(
-    @SerialName("id_usuario") val id: Int = 0,
-    val nickname: String = "",
-    val nombre: String = "",
-    @SerialName("apellido_paterno") val apellidoPaterno: String? = null,
-    @SerialName("apellido_materno") val apellidoMaterno: String? = null,
-    val ci: String? = null,
-    val contrasenia: String = "",
-    @SerialName("create_at") val createdAt: String? = null,
-    @SerialName("update_at") val updatedAt: String? = null,
-)
-
-@Serializable
-data class RolRow(
-    @SerialName("id_rol") val id: Int = 0,
-    val rol: String = "",
-)
-
-@Serializable
-data class AsignacionRolRow(
-    @SerialName("id_asignacion_rol") val id: Int = 0,
-    @SerialName("id_usuario") val idUsuario: Int = 0,
-    @SerialName("id_rol") val idRol: Int = 0,
-)
-
-// ── Servicio ──────────────────────────────────────────────────────────────────
-
-object SupabaseAuthService {
-
-    private val client by lazy {
-        createSupabaseClient(
-            supabaseUrl = BuildConfig.SUPABASE_URL,
-            supabaseKey = BuildConfig.SUPABASE_ANON_KEY,
-        ) {
-            install(Auth)
-            install(Postgrest)
-        }
-    }
+    private val client get() = SupabaseClientProvider.client
 
     suspend fun signIn(nickname: String, password: String): LoginResult {
         if (BuildConfig.SUPABASE_ANON_KEY.isBlank()) {
@@ -93,9 +54,7 @@ object SupabaseAuthService {
 
             // 5. Parsear el rol
             val role = parseRole(rolRow.rol)
-                ?: return LoginResult.Error(
-                    "Rol '${rolRow.rol}' no es reconocido por la aplicación."
-                )
+                ?: return LoginResult.Error("Rol '${rolRow.rol}' no es reconocido por la aplicación.")
 
             LoginResult.Success(
                 UserSession(
@@ -118,9 +77,9 @@ object SupabaseAuthService {
 
     private fun parseRole(roleString: String?): UserRole? =
         when (roleString?.trim()?.lowercase()) {
-            "admin", "administrador" -> UserRole.ADMINISTRADOR
-            "supervisor"            -> UserRole.SUPERVISOR
+            "admin", "administrador"                                    -> UserRole.ADMINISTRADOR
+            "supervisor"                                                -> UserRole.SUPERVISOR
             "asesor_venta", "asesor_ventas", "asesor ventas", "asesor" -> UserRole.ASESOR_VENTAS
-            else                    -> null
+            else                                                        -> null
         }
 }

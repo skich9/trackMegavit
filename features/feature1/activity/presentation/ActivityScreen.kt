@@ -1,5 +1,6 @@
-package com.example.trackmegavit
+﻿package com.example.trackmegavit.feature.activity.presentation
 
+import com.example.trackmegavit.core.ui.MdmColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ── Activity Tracking screen ──────────────────────────────────────────────────
+// â”€â”€ Activity Tracking screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun ActivityScreen(onUserClick: () -> Unit) {
@@ -72,7 +73,7 @@ fun ActivityScreen(onUserClick: () -> Unit) {
     }
 }
 
-// ── Top app bar ───────────────────────────────────────────────────────────────
+// â”€â”€ Top app bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun ActivityTopBar(onUserClick: () -> Unit) {
@@ -116,7 +117,7 @@ private fun ActivityTopBar(onUserClick: () -> Unit) {
     }
 }
 
-// ── Map placeholder ───────────────────────────────────────────────────────────
+// â”€â”€ Map placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun MapSection() {
@@ -200,7 +201,7 @@ private fun MapSection() {
     }
 }
 
-// ── Stats row ─────────────────────────────────────────────────────────────────
+// â”€â”€ Stats row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun StatsRow() {
@@ -287,7 +288,7 @@ private fun StatCard(modifier: Modifier, label: String, value: String, valueColo
     }
 }
 
-// ── Daily itinerary ───────────────────────────────────────────────────────────
+// â”€â”€ Daily itinerary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun DailyItinerarySection() {
@@ -330,19 +331,19 @@ private fun DailyItinerarySection() {
         // Scheduled
         ScheduledVisitItem(
             name     = "Dr. Marcus Thorne",
-            location = "Clinica St. Mary • 14:30",
+            location = "Clinica St. Mary â€¢ 14:30",
             icon     = Icons.Default.MedicalServices,
         )
         Spacer(Modifier.height(8.dp))
         ScheduledVisitItem(
             name     = "Central Pharma Labs",
-            location = "Oficina de compras • 16:00",
+            location = "Oficina de compras â€¢ 16:00",
             icon     = Icons.Default.LocalPharmacy,
         )
         Spacer(Modifier.height(8.dp))
 
         // Completed
-        CompletedVisitItem(name = "Dra. Sarah Jenkins", sub = "Completada • 09:15 a. m.")
+        CompletedVisitItem(name = "Dra. Sarah Jenkins", sub = "Completada â€¢ 09:15 a. m.")
         Spacer(Modifier.height(12.dp))
 
         // Dashed CTA
@@ -401,7 +402,7 @@ private fun ActiveVisitCard() {
                             color = colors.primary,
                         )
                         Text(
-                            "Hospital General • Oncologia",
+                            "Hospital General â€¢ Oncologia",
                             style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
                             color = colors.onSurfaceVariant,
                         )
@@ -566,7 +567,7 @@ private fun CompletedVisitItem(name: String, sub: String) {
     }
 }
 
-// ── Log Activity form ─────────────────────────────────────────────────────────
+// â”€â”€ Log Activity form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun LogActivityForm(

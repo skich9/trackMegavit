@@ -29,15 +29,31 @@ kotlin {
     }
     
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.compose.material.icons.extended)
-            implementation(libs.supabase.core)
-            implementation(libs.supabase.auth)
-            implementation(libs.supabase.postgrest)
-            implementation(libs.ktor.client.okhttp)
+        val androidMain by getting {
+            kotlin.srcDirs(
+                "../core/ui",
+                "../core/network/src/commonMain",
+                "../features/feature1/activity/presentation",
+                "../features/feature1/admin/data",
+                "../features/feature1/admin/domain",
+                "../features/feature1/admin/presentation",
+                "../features/feature1/auth/data",
+                "../features/feature1/auth/domain",
+                "../features/feature1/auth/presentation",
+                "../features/feature1/home/presentation",
+            )
+
+            dependencies {
+                implementation(libs.compose.uiToolingPreview)
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.compose.material.icons.extended)
+                implementation(libs.supabase.core)
+                implementation(libs.supabase.auth)
+                implementation(libs.supabase.postgrest)
+                implementation(libs.ktor.client.okhttp)
+            }
         }
+
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)

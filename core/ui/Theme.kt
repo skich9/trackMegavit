@@ -1,4 +1,4 @@
-package com.example.trackmegavit
+package com.example.trackmegavit.core.ui
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme

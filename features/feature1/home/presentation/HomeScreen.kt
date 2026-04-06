@@ -1,5 +1,6 @@
-package com.example.trackmegavit
+﻿package com.example.trackmegavit.feature.home.presentation
 
+import com.example.trackmegavit.core.ui.MdmColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ── Home / Dashboard screen ───────────────────────────────────────────────────
+// â”€â”€ Home / Dashboard screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun HomeScreen(onUserClick: () -> Unit) {
@@ -38,7 +39,7 @@ fun HomeScreen(onUserClick: () -> Unit) {
     }
 }
 
-// ── Top bar ───────────────────────────────────────────────────────────────────
+// â”€â”€ Top bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun HomeTopBar(onUserClick: () -> Unit) {
@@ -106,7 +107,7 @@ private fun HomeTopBar(onUserClick: () -> Unit) {
     }
 }
 
-// ── KPI cards ─────────────────────────────────────────────────────────────────
+// â”€â”€ KPI cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun KpiSection() {
@@ -198,7 +199,7 @@ private fun KpiCard(
     }
 }
 
-// ── Quick actions ─────────────────────────────────────────────────────────────
+// â”€â”€ Quick actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun QuickActionsCard() {
@@ -269,7 +270,7 @@ private fun QuickActionButton(
     }
 }
 
-// ── Weekly bar chart ──────────────────────────────────────────────────────────
+// â”€â”€ Weekly bar chart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun VisitPerformanceChart() {
@@ -376,7 +377,7 @@ private fun VisitPerformanceChart() {
     }
 }
 
-// ── Recent activity ───────────────────────────────────────────────────────────
+// â”€â”€ Recent activity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun RecentActivitySection() {
@@ -409,11 +410,11 @@ private fun RecentActivitySection() {
             }
         }
         Spacer(Modifier.height(8.dp))
-        RecentActivityItem("Dra. Sarah Miller",  "10:30 a. m. • 3 muestras", isCompleted = true)
+        RecentActivityItem("Dra. Sarah Miller",  "10:30 a. m. â€¢ 3 muestras", isCompleted = true)
         Spacer(Modifier.height(8.dp))
-        RecentActivityItem("Clinica Riverside",  "09:15 a. m. • 7 muestras", isCompleted = true)
+        RecentActivityItem("Clinica Riverside",  "09:15 a. m. â€¢ 7 muestras", isCompleted = true)
         Spacer(Modifier.height(8.dp))
-        RecentActivityItem("Dr. James Wilson",  "Programada • 11:45 a. m.", isCompleted = false)
+        RecentActivityItem("Dr. James Wilson",  "Programada â€¢ 11:45 a. m.", isCompleted = false)
     }
 }
 
@@ -467,7 +468,7 @@ private fun RecentActivityItem(name: String, sub: String, isCompleted: Boolean) 
     }
 }
 
-// ── Monthly milestone ─────────────────────────────────────────────────────────
+// â”€â”€ Monthly milestone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun MonthlyMilestoneCard() {

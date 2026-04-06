@@ -1,5 +1,13 @@
-package com.example.trackmegavit
-
+﻿package com.example.trackmegavit
+import com.example.trackmegavit.core.ui.MdmTrackProTheme
+import com.example.trackmegavit.feature.auth.domain.LoginResult
+import com.example.trackmegavit.feature.auth.domain.UserRole
+import com.example.trackmegavit.feature.auth.domain.UserSession
+import com.example.trackmegavit.feature.auth.data.AuthRepository
+import com.example.trackmegavit.feature.auth.presentation.LoginScreen
+import com.example.trackmegavit.feature.home.presentation.HomeScreen
+import com.example.trackmegavit.feature.admin.presentation.AdminHomeScreen
+import com.example.trackmegavit.feature.activity.presentation.ActivityScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -80,7 +88,7 @@ fun App() {
                 isLocked = isLocked,
                 lockSeconds = if (isLocked) authState.lockedUntil?.remainingLockSeconds() ?: 0 else 0,
                 onLogin = { username, password ->
-                    when (val result = SupabaseAuthService.signIn(username, password)) {
+                    when (val result = AuthRepository.signIn(username, password)) {
                         is LoginResult.Success -> {
                             authState = AuthUiState(session = result.session)
                             current = allowedScreensFor(result.session.role).first()
@@ -126,7 +134,15 @@ fun App() {
                     .padding(padding),
             ) {
                 when (current) {
-                    Screen.HOME -> HomeScreen(onUserClick = { userMenuExpanded = true })
+                    Screen.HOME -> when (currentSession.role) {
+                        UserRole.ADMINISTRADOR, UserRole.SUPERVISOR ->
+                            AdminHomeScreen(
+                                session = currentSession,
+                                onUserClick = { userMenuExpanded = true },
+                            )
+                        UserRole.ASESOR_VENTAS ->
+                            HomeScreen(onUserClick = { userMenuExpanded = true })
+                    }
                     Screen.ACTIVITY -> ActivityScreen(onUserClick = { userMenuExpanded = true })
                     Screen.REPORTS -> PlaceholderScreen("Reportes")
                     Screen.ADMIN -> PlaceholderScreen("Administracion")
@@ -179,7 +195,7 @@ fun App() {
                             onClick = {
                                 userMenuExpanded = false
                                 scope.launch {
-                                    SupabaseAuthService.signOut()
+                                    AuthRepository.signOut()
                                     authState = AuthUiState()
                                     current = Screen.HOME
                                     snackbarHostState.showSnackbar("Sesion cerrada correctamente")
@@ -223,7 +239,7 @@ fun App() {
 
                                     scope.launch {
                                         isUpdatingPassword = true
-                                        val result = SupabaseAuthService.changePassword(password)
+                                        val result = AuthRepository.changePassword(password)
                                         isUpdatingPassword = false
                                         if (result.isSuccess) {
                                             showChangePasswordDialog = false
@@ -327,6 +343,10 @@ private fun PlaceholderScreen(title: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(title, style = MaterialTheme.typography.headlineMedium)
     }
+}
+
+private fun TimeSource.Monotonic.ValueTimeMark.hasNotPassedNow(): Boolean {
+    return this > TimeSource.Monotonic.markNow()
 }
 
 private fun TimeSource.Monotonic.ValueTimeMark.remainingLockSeconds(): Int {

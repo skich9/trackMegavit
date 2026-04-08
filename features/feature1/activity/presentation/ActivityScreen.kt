@@ -3,8 +3,6 @@
 import com.example.trackmegavit.core.ui.MdmColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -37,9 +35,6 @@ import org.osmdroid.views.overlay.Marker
 @Composable
 fun ActivityScreen(onUserClick: () -> Unit) {
     val colors = MaterialTheme.colorScheme
-    var selectedOutcome by remember { mutableStateOf("VISITADO") }
-    var visitType      by remember { mutableStateOf("Muestras de producto") }
-    var observations   by remember { mutableStateOf("") }
     val advisors = remember {
         listOf(
             SalesAdvisorLocation("Ana Torres", -12.0528, -77.0322, "Lima Centro"),
@@ -51,53 +46,29 @@ fun ActivityScreen(onUserClick: () -> Unit) {
     val advisorOptions = remember(advisors) { listOf("Todos los asesores") + advisors.map { it.name } }
     var selectedAdvisor by remember { mutableStateOf(advisorOptions.first()) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colors.background),
-            contentPadding = PaddingValues(bottom = 96.dp),
-        ) {
-            item { ActivityTopBar(onUserClick = onUserClick) }
-            item {
-                AdvisorSelector(
-                    selectedAdvisor = selectedAdvisor,
-                    advisorOptions = advisorOptions,
-                    onAdvisorSelected = { selectedAdvisor = it },
-                )
-            }
-            item {
-                MapSection(
-                    advisors = advisors,
-                    selectedAdvisor = selectedAdvisor,
-                )
-            }
-            item { StatsRow() }
-            item { DailyItinerarySection() }
-            item {
-                LogActivityForm(
-                    selectedOutcome  = selectedOutcome,
-                    onOutcomeSelected = { selectedOutcome = it },
-                    visitType        = visitType,
-                    onVisitTypeChanged = { visitType = it },
-                    observations     = observations,
-                    onObservationsChanged = { observations = it },
-                )
-            }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background),
+        contentPadding = PaddingValues(bottom = 32.dp),
+    ) {
+        item { ActivityTopBar(onUserClick = onUserClick) }
+        item {
+            AdvisorSelector(
+                selectedAdvisor = selectedAdvisor,
+                advisorOptions = advisorOptions,
+                onAdvisorSelected = { selectedAdvisor = it },
+            )
         }
-
-        // FAB
-        FloatingActionButton(
-            onClick = {},
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 16.dp),
-            containerColor = colors.tertiary,
-            contentColor   = Color.White,
-            shape          = CircleShape,
-        ) {
-            Icon(Icons.Default.Edit, contentDescription = "Registrar actividad")
+        item { StatsRow() }
+        item { DailyItinerarySection() }
+        item {
+            MapSection(
+                advisors = advisors,
+                selectedAdvisor = selectedAdvisor,
+            )
         }
+        item { ContactActionsSection() }
     }
 }
 
@@ -698,215 +669,63 @@ private fun CompletedVisitItem(name: String, sub: String) {
     }
 }
 
-// â”€â”€ Log Activity form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// ── Acciones de contacto ────────────────────────────────────────────────────────
 
 @Composable
-private fun LogActivityForm(
-    selectedOutcome: String,
-    onOutcomeSelected: (String) -> Unit,
-    visitType: String,
-    onVisitTypeChanged: (String) -> Unit,
-    observations: String,
-    onObservationsChanged: (String) -> Unit,
-) {
+private fun ContactActionsSection() {
     val colors = MaterialTheme.colorScheme
-    Surface(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        color  = colors.surfaceContainerLow,
-        shape  = RoundedCornerShape(24.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-
-            // Header
+        Button(
+            onClick = {},
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colors.primary,
+                contentColor = Color.White,
+            ),
+            contentPadding = PaddingValues(vertical = 14.dp),
+        ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.Top,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        "Registrar actividad",
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Black),
-                        color = colors.primary,
-                    )
-                    Text(
-                        "Registrando resultado de visita para la ubicacion actual",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.onSurfaceVariant,
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(Icons.Default.Assignment, contentDescription = null, tint = colors.primary)
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // Outcome status
-            FormLabel("ESTADO DE RESULTADO")
-            Spacer(Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                listOf("VISITADO", "OCUPADO", "AUSENTE").forEach { outcome ->
-                    val isSelected = selectedOutcome == outcome
-                    Button(
-                        onClick = { onOutcomeSelected(outcome) },
-                        modifier = Modifier.weight(1f),
-                        shape    = RoundedCornerShape(12.dp),
-                        colors   = ButtonDefaults.buttonColors(
-                            containerColor = if (isSelected) colors.primary else colors.surfaceContainerHighest,
-                            contentColor   = if (isSelected) Color.White else colors.onSurfaceVariant,
-                        ),
-                        contentPadding = PaddingValues(vertical = 12.dp),
-                    ) {
-                        Text(outcome, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Visit type (simple custom dropdown)
-            FormLabel("TIPO DE VISITA")
-            Spacer(Modifier.height(8.dp))
-            VisitTypeDropdown(visitType, onVisitTypeChanged)
-
-            Spacer(Modifier.height(16.dp))
-
-            // Observations
-            FormLabel("OBSERVACIONES Y NOTAS")
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                value       = observations,
-                onValueChange = onObservationsChanged,
-                placeholder = { Text("Ingresa detalles de la visita...", color = colors.onSurfaceVariant) },
-                modifier    = Modifier.fillMaxWidth(),
-                shape       = RoundedCornerShape(16.dp),
-                minLines    = 3,
-                colors      = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor      = Color.Transparent,
-                    unfocusedBorderColor    = Color.Transparent,
-                    focusedContainerColor   = colors.surfaceContainerHighest,
-                    unfocusedContainerColor = colors.surfaceContainerHighest,
-                ),
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // Evidence / Photos
-            FormLabel("EVIDENCIA / FOTOS")
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color.White)
-                        .border(BorderStroke(2.dp, colors.outlineVariant), RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            Icons.Default.CameraAlt,
-                            contentDescription = "Adjuntar foto",
-                            tint = colors.outline,
-                            modifier = Modifier.size(24.dp),
-                        )
-                        Text(
-                            "ADJUNTAR",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize   = 9.sp,
-                            ),
-                            color = colors.outline,
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(colors.surfaceContainerHigh),
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // Submit
-            Button(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-                shape    = RoundedCornerShape(50.dp),
-                colors   = ButtonDefaults.buttonColors(
-                    containerColor = colors.primary,
-                    contentColor   = Color.White,
-                ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                contentPadding = PaddingValues(vertical = 16.dp),
-            ) {
+                Icon(Icons.Default.Message, contentDescription = null, modifier = Modifier.size(20.dp))
                 Text(
-                    "ENVIAR REPORTE DE VISITA",
-                    style = MaterialTheme.typography.titleSmall.copy(
+                    "ENVIAR MENSAJE",
+                    style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
+                        letterSpacing = 0.5.sp,
                     ),
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun FormLabel(text: String) {
-    Text(
-        text,
-        style = MaterialTheme.typography.labelSmall.copy(
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            fontSize = 10.sp,
-        ),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-}
-
-@Composable
-private fun VisitTypeDropdown(current: String, onSelected: (String) -> Unit) {
-    val colors  = MaterialTheme.colorScheme
-    val options = listOf("Muestras de producto", "Toma de pedido", "Introduccion inicial")
-    var expanded by remember { mutableStateOf(false) }
-
-    Box {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(colors.surfaceContainerHighest)
-                .clickable { expanded = true }
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment     = Alignment.CenterVertically,
+        Button(
+            onClick = {},
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colors.tertiary,
+                contentColor = Color.White,
+            ),
+            contentPadding = PaddingValues(vertical = 14.dp),
         ) {
-            Text(current, style = MaterialTheme.typography.bodyMedium, color = colors.onSurface)
-            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = colors.onSurfaceVariant)
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            options.forEach { opt ->
-                DropdownMenuItem(
-                    text    = { Text(opt) },
-                    onClick = { onSelected(opt); expanded = false },
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(20.dp))
+                Text(
+                    "LLAMAR",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.sp,
+                    ),
                 )
             }
         }

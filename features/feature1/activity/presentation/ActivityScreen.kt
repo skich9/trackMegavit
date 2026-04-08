@@ -17,14 +17,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 // â”€â”€ Activity Tracking screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -34,6 +40,16 @@ fun ActivityScreen(onUserClick: () -> Unit) {
     var selectedOutcome by remember { mutableStateOf("VISITADO") }
     var visitType      by remember { mutableStateOf("Muestras de producto") }
     var observations   by remember { mutableStateOf("") }
+    val advisors = remember {
+        listOf(
+            SalesAdvisorLocation("Ana Torres", -12.0528, -77.0322, "Lima Centro"),
+            SalesAdvisorLocation("Luis Paredes", -12.0674, -77.0428, "Lince"),
+            SalesAdvisorLocation("Carla Mena", -12.0871, -77.0504, "Miraflores"),
+            SalesAdvisorLocation("Jorge Salas", -12.0950, -77.0266, "San Isidro"),
+        )
+    }
+    val advisorOptions = remember(advisors) { listOf("Todos los asesores") + advisors.map { it.name } }
+    var selectedAdvisor by remember { mutableStateOf(advisorOptions.first()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -43,7 +59,19 @@ fun ActivityScreen(onUserClick: () -> Unit) {
             contentPadding = PaddingValues(bottom = 96.dp),
         ) {
             item { ActivityTopBar(onUserClick = onUserClick) }
-            item { MapSection() }
+            item {
+                AdvisorSelector(
+                    selectedAdvisor = selectedAdvisor,
+                    advisorOptions = advisorOptions,
+                    onAdvisorSelected = { selectedAdvisor = it },
+                )
+            }
+            item {
+                MapSection(
+                    advisors = advisors,
+                    selectedAdvisor = selectedAdvisor,
+                )
+            }
             item { StatsRow() }
             item { DailyItinerarySection() }
             item {
@@ -69,6 +97,67 @@ fun ActivityScreen(onUserClick: () -> Unit) {
             shape          = CircleShape,
         ) {
             Icon(Icons.Default.Edit, contentDescription = "Registrar actividad")
+        }
+    }
+}
+
+@Composable
+private fun AdvisorSelector(
+    selectedAdvisor: String,
+    advisorOptions: List<String>,
+    onAdvisorSelected: (String) -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Text(
+            "Asesor de ventas",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = colors.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(6.dp))
+
+        Box {
+            OutlinedButton(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.onSurface),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        selectedAdvisor,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = colors.primary)
+                }
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                advisorOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onAdvisorSelected(option)
+                            expanded = false
+                        },
+                    )
+                }
+            }
         }
     }
 }
@@ -117,28 +206,68 @@ private fun ActivityTopBar(onUserClick: () -> Unit) {
     }
 }
 
-// â”€â”€ Map placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€ Mapa de asesores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
-private fun MapSection() {
+private fun MapSection(
+    advisors: List<SalesAdvisorLocation>,
+    selectedAdvisor: String,
+) {
     val colors = MaterialTheme.colorScheme
+    val context = LocalContext.current
+    val filteredAdvisors = remember(advisors, selectedAdvisor) {
+        if (selectedAdvisor == "Todos los asesores") {
+            advisors
+        } else {
+            advisors.filter { it.name == selectedAdvisor }
+        }
+    }
+    val mapAdvisors = if (filteredAdvisors.isEmpty()) advisors else filteredAdvisors
+    val centerPoint = remember(mapAdvisors) {
+        GeoPoint(
+            mapAdvisors.map { it.latitude }.average(),
+            mapAdvisors.map { it.longitude }.average(),
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(24.dp))
             .height(220.dp)
-            .background(
-                Brush.linearGradient(
-                    listOf(
-                        Color(0xFF2A5C38),
-                        Color(0xFF3B6B45),
-                        Color(0xFF4D8059),
-                        Color(0xFF2A5C38),
-                    )
-                )
-            ),
+            .background(Color(0xFFE7ECE9)),
     ) {
+        AndroidView(
+            modifier = Modifier.matchParentSize(),
+            factory = {
+                Configuration.getInstance().userAgentValue = context.packageName
+                MapView(it).apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                    setMultiTouchControls(true)
+                    minZoomLevel = 10.0
+                    maxZoomLevel = 19.0
+                }
+            },
+            update = { mapView ->
+                mapView.controller.setZoom(12.8)
+                mapView.controller.setCenter(centerPoint)
+
+                mapView.overlays.removeAll { overlay -> overlay is Marker }
+                mapAdvisors.forEach { advisor ->
+                    mapView.overlays.add(
+                        Marker(mapView).apply {
+                            position = GeoPoint(advisor.latitude, advisor.longitude)
+                            title = advisor.name
+                            subDescription = "Ubicacion actual: ${advisor.zone}"
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        }
+                    )
+                }
+                mapView.invalidate()
+            },
+        )
+
         // Insignia de rastreo activo
         Box(
             modifier = Modifier
@@ -169,37 +298,39 @@ private fun MapSection() {
             }
         }
 
-        // Boton de accion
-        Button(
-            onClick = {},
+        Surface(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 32.dp, vertical = 18.dp)
                 .fillMaxWidth(),
-            shape  = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colors.primary,
-                contentColor   = Color.White,
-            ),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
+            shape = RoundedCornerShape(50.dp),
+            color = colors.surface.copy(alpha = 0.92f),
+            tonalElevation = 4.dp,
         ) {
             Row(
                 verticalAlignment     = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier              = Modifier.padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
             ) {
-                Icon(Icons.Default.PlayArrow, contentDescription = null)
                 Text(
-                    "INICIAR JORNADA EN CAMPO",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.sp,
-                    ),
+                    "${mapAdvisors.size} asesores en campo",
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = colors.onSurface,
                 )
+                Icon(Icons.Default.Groups, contentDescription = null, tint = colors.primary)
             }
         }
     }
 }
+
+private data class SalesAdvisorLocation(
+    val name: String,
+    val latitude: Double,
+    val longitude: Double,
+    val zone: String,
+)
 
 // â”€â”€ Stats row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 

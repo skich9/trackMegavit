@@ -19,10 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 // â”€â”€ Pantalla de inicio para Admin y Supervisor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -77,6 +84,12 @@ fun AdminHomeScreen(
         }
 
         item { LugaresSectionHeader(count = if (isLoadingLugares) 0 else lugares.size) }
+        item {
+            LugaresVisitadosMap(
+                lugares = lugares,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+        }
 
         when {
             isLoadingLugares -> item { LugaresLoadingCard() }
@@ -91,6 +104,112 @@ fun AdminHomeScreen(
         }
     }
 }
+
+@Composable
+private fun LugaresVisitadosMap(
+    lugares: List<LugarVisitado>,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MaterialTheme.colorScheme
+    val context = LocalContext.current
+    val fallbackPoints = remember {
+        listOf(
+            LugarMapPoint("Botica San Miguel", -12.0713, -77.0847),
+            LugarMapPoint("Clinica Stella Maris", -12.0751, -77.0534),
+            LugarMapPoint("Hospital Central", -12.0608, -77.0442),
+            LugarMapPoint("Farmacia Miraflores", -12.1206, -77.0297),
+        )
+    }
+    val mapPoints = remember(lugares, fallbackPoints) {
+        if (lugares.isEmpty()) {
+            fallbackPoints
+        } else {
+            val coords = listOf(
+                GeoPoint(-12.0713, -77.0847),
+                GeoPoint(-12.0751, -77.0534),
+                GeoPoint(-12.0608, -77.0442),
+                GeoPoint(-12.1206, -77.0297),
+            )
+            lugares.take(coords.size).mapIndexed { index, lugar ->
+                LugarMapPoint(lugar.nombreLugar, coords[index].latitude, coords[index].longitude)
+            }
+        }
+    }
+    val centerPoint = remember(mapPoints) {
+        GeoPoint(
+            mapPoints.map { it.latitude }.average(),
+            mapPoints.map { it.longitude }.average(),
+        )
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color(0xFFDCE9E0)),
+    ) {
+        AndroidView(
+            modifier = Modifier.matchParentSize(),
+            factory = {
+                Configuration.getInstance().userAgentValue = context.packageName
+                MapView(it).apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                    setMultiTouchControls(true)
+                    minZoomLevel = 10.0
+                    maxZoomLevel = 19.0
+                }
+            },
+            update = { mapView ->
+                mapView.controller.setZoom(12.3)
+                mapView.controller.setCenter(centerPoint)
+
+                mapView.overlays.removeAll { overlay -> overlay is Marker }
+                mapPoints.forEach { point ->
+                    mapView.overlays.add(
+                        Marker(mapView).apply {
+                            position = GeoPoint(point.latitude, point.longitude)
+                            title = point.name
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        }
+                    )
+                }
+                mapView.invalidate()
+            },
+        )
+
+        Surface(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(12.dp),
+            shape = RoundedCornerShape(10.dp),
+            color = Color.White.copy(alpha = 0.9f),
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(Icons.Default.Place, contentDescription = null, tint = colors.tertiary, modifier = Modifier.size(15.dp))
+                Text(
+                    "LUGARES DE HOY",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        fontSize = 10.sp,
+                    ),
+                    color = colors.tertiary,
+                )
+            }
+        }
+    }
+}
+
+private data class LugarMapPoint(
+    val name: String,
+    val latitude: Double,
+    val longitude: Double,
+)
 
 // â”€â”€ Barra superior â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 

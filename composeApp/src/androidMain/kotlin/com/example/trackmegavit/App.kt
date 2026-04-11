@@ -6,7 +6,7 @@ import com.example.trackmegavit.feature.auth.domain.UserRole
 import com.example.trackmegavit.feature.auth.domain.UserSession
 import com.example.trackmegavit.feature.auth.data.AuthRepository
 import com.example.trackmegavit.feature.auth.presentation.LoginScreen
-import com.example.trackmegavit.feature.home.presentation.HomeScreen
+import com.example.trackmegavit.feature.home.presentation.SalesAdvisorHomeScreen
 import com.example.trackmegavit.feature.admin.presentation.AdminHomeScreen
 import com.example.trackmegavit.feature.admin.presentation.AdminSettingsScreen
 import com.example.trackmegavit.feature.activity.presentation.ActivityScreen
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
@@ -23,6 +22,7 @@ import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -143,7 +143,7 @@ fun App() {
                                 onUserClick = { userMenuExpanded = true },
                             )
                         UserRole.ASESOR_VENTAS ->
-                            HomeScreen(onUserClick = { userMenuExpanded = true })
+                            SalesAdvisorHomeScreen(onUserClick = { userMenuExpanded = true })
                     }
                     Screen.ACTIVITY -> ActivityScreen(onUserClick = { userMenuExpanded = true })
                     Screen.REPORTS -> ReportsScreenAndroid(onUserClick = { userMenuExpanded = true })
@@ -306,6 +306,7 @@ private fun allowedScreensFor(role: UserRole): List<Screen> {
             Screen.HOME,
             Screen.ACTIVITY,
             Screen.REPORTS,
+            Screen.ADMIN,
         )
         UserRole.ASESOR_VENTAS -> listOf(
             Screen.HOME,
@@ -341,7 +342,7 @@ private fun MdmBottomNav(
             Triple(Screen.HOME, Icons.Default.Home, "INICIO"),
             Triple(Screen.ACTIVITY, Icons.Default.GpsFixed, "ACTIVIDAD"),
             Triple(Screen.REPORTS, Icons.Default.Assessment, "REPORTES"),
-            Triple(Screen.ADMIN, Icons.Default.AdminPanelSettings, "ADMIN"),
+            Triple(Screen.ADMIN, Icons.Default.Settings, "CONFIG"),
         )
 
         navItems

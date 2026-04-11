@@ -31,16 +31,8 @@ kotlin {
     sourceSets {
         val androidMain by getting {
             kotlin.srcDirs(
-                "../core/ui",
-                "../core/network/src/commonMain",
-                "../features/feature1/activity/presentation",
-                "../features/feature1/admin/data",
-                "../features/feature1/admin/domain",
-                "../features/feature1/admin/presentation",
-                "../features/feature1/auth/data",
-                "../features/feature1/auth/domain",
-                "../features/feature1/auth/presentation",
-                "../features/feature1/home/presentation",
+                "../core",
+                "../features"
             )
 
             dependencies {
@@ -66,20 +58,17 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(projects.shared)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
     }
 }
 
 android {
     namespace = "com.example.trackmegavit"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.trackmegavit"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = 24
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
@@ -91,11 +80,6 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
         }
     }
     compileOptions {

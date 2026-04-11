@@ -1,4 +1,5 @@
 ﻿package com.example.trackmegavit
+
 import com.example.trackmegavit.core.ui.MdmTrackProTheme
 import com.example.trackmegavit.feature.auth.domain.LoginResult
 import com.example.trackmegavit.feature.auth.domain.UserRole
@@ -7,6 +8,7 @@ import com.example.trackmegavit.feature.auth.data.AuthRepository
 import com.example.trackmegavit.feature.auth.presentation.LoginScreen
 import com.example.trackmegavit.feature.home.presentation.HomeScreen
 import com.example.trackmegavit.feature.admin.presentation.AdminHomeScreen
+import com.example.trackmegavit.feature.admin.presentation.AdminSettingsScreen
 import com.example.trackmegavit.feature.activity.presentation.ActivityScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -144,8 +146,26 @@ fun App() {
                             HomeScreen(onUserClick = { userMenuExpanded = true })
                     }
                     Screen.ACTIVITY -> ActivityScreen(onUserClick = { userMenuExpanded = true })
-                    Screen.REPORTS -> PlaceholderScreen("Reportes")
-                    Screen.ADMIN -> PlaceholderScreen("Administracion")
+                    Screen.REPORTS -> ReportsScreenAndroid(onUserClick = { userMenuExpanded = true })
+                    Screen.ADMIN -> AdminSettingsScreen(
+                        session = currentSession,
+                        darkTheme = darkTheme,
+                        onToggleTheme = { darkTheme = !darkTheme },
+                        onLogout = {
+                            scope.launch {
+                                AuthRepository.signOut()
+                                authState = AuthUiState()
+                                current = Screen.HOME
+                                snackbarHostState.showSnackbar("Sesion cerrada correctamente")
+                            }
+                        },
+                        onChangePassword = { password ->
+                            AuthRepository.changePassword(password)
+                        },
+                        onShowMessage = { message ->
+                            snackbarHostState.showSnackbar(message)
+                        }
+                    )
                 }
 
                 Box(modifier = Modifier.align(Alignment.TopEnd)) {
